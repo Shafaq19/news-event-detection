@@ -41,4 +41,4 @@ for pair in tweetPairs:
         else:  # dismilar and different clusters assigned
             TN += 1
 print("RAND INDEX "+str((TP+TN)/(TN+TP+FN+FP)))
-print("Recall"+str(TP/TP+FN))
+print("Recall"+str(TP/(TP+FN)))
