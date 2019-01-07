@@ -4,6 +4,8 @@ from nltk.stem import PorterStemmer
 import math
 
 from DatasetA.index import summarization
+from DatasetA.topics import implementLDA
+
 
 def tweets_to_clusters():
 
@@ -23,5 +25,5 @@ def tweets_to_clusters():
     df.to_csv('out.csv')
 def intregation():
      tweets_to_clusters()
-     #implementLDA()
+     implementLDA()
      summarization()
