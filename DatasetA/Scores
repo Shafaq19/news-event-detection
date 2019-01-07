@@ -1,0 +1,133 @@
+
+threshold = 0.25
+threshold2 = 0.36
+RAND INDEX 0.755102098156366
+Recall0.7013100182033487
+
+
+threshold = 0.3
+threshold2 = 0.4
+RAND INDEX 0.9104409516490236
+Recall0.1523478476379051
+-------------------------------------------------------
+
+a =  float(2/11)  # commen Noun
+b = float(4/11)  # properNoun
+c =  float(1/11) # verb
+d = float(4/11) # hashtag threshold
+threshold = 0.2
+threshold2 = 0.33
+
+RAND INDEX 0.6758622935105073
+Recall0.7641553069686289
+
+
+----------------------------------------------------------
+a =  float(2/11)  # commen Noun
+b = float(4/11)  # properNoun
+c =  float(1/11) # verb
+d = float(4/11) # hashtag threshold
+threshold = 0.2
+threshold2 = 0.4
+
+No of evens: 53
+No of clusters: 1522
+RAND INDEX 0.733316078703589
+Recall0.6148789016760732
+
+-----------------------------------------------------------
+No of evens: 53
+No of clusters: 1708
+RAND INDEX 0.8089230235267868
+Recall0.5503166534465427
+a =  float(1/11)  # commen Noun
+b = float(5/11)  # properNoun
+c =  float(1/11) # verb
+d = float(4/11) # hashtag threshold
+threshold = 0.2
+threshold2 = 0.5
+
+-------------------------------------------------------------
+a =  float(1/11)  # commen Noun
+b = float(5/11)  # properNoun
+c =  float(1/11) # verb
+d = float(4/11) # hashtag threshold
+threshold = 0.2
+threshold2 = 0.4
+
+No of evens: 53
+No of clusters: 2422
+RAND INDEX 0.8986273975093173
+Recall0.27817327706000344
+---------------------------------------------------------------
+
+a =  float(1/11)  # commen Noun
+b = float(5/11)  # properNoun
+c =  float(1/11) # verb
+d = float(4/11) # hashtag threshold
+threshold = 0.2
+threshold2 = 0.25
+
+No of evens: 53
+No of clusters: 1026
+RAND INDEX 0.6278138020510532
+Recall0.8186768875785835
+------------------------------------------------------------------
+
+
+a =  float(2/11)  # commen Noun
+b = float(5/11)  # properNoun
+c =  float(1/11) # verb
+d = float(3/11) # hashtag threshold
+threshold = 0.2
+threshold2 = 0.25
+No of clusters: 1045
+RAND INDEX 0.6550919172637198
+Recall0.8096328648969593
+-----------------------------------
+
+a =  float(2/11)  # commen Noun
+b = float(5/11)  # properNoun
+c =  float(1/11) # verb
+d = float(3/11) # hashtag threshold
+threshold = 0.25
+threshold2 = 0.35
+No of evens: 53
+No of clusters: 1282
+RAND INDEX 0.6990107841435903
+Recall0.7509878646550873
+----------------------------------
+
+a =  float(2/11)  # commen Noun
+b = float(4/11)  # properNoun
+c =  float(1/11) # verb
+d = float(3/11) # hashtag threshold
+threshold = 0.25
+threshold2 = 0.4
+No of evens: 53
+No of clusters: 1875
+RAND INDEX 0.7836243316723273
+Recall0.5773257975313157
+
+
+
+
+
+
+
+"""""""""""""""""""""
+
+a =  float(2/11)  # commen Noun
+b = float(4/11)  # properNoun
+c =  float(1/11) # verb
+d = float(3/11) # hashtag threshold
+threshold = 0.3
+threshold2 = 0.45
+
+
+
+
+No of evens: 53
+No of clusters: 2905
+RAND INDEX 0.8844013684706349
+Recall0.2743798635312111
