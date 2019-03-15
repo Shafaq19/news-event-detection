@@ -29,6 +29,10 @@ Newsstand uses a number of open source projects to work properly:
 * [NLTK](df1)  - leading platform for building Python programs to work with human language data.
 * [Standford NER reconizer](df1) - an awesome named entity reconizer 
 * [Python Libararies](dill) Pandas, Numpy and what not!!!
+- openCalais API for Tagging
+##Visualization
+
+
 
 ### Installation
 
