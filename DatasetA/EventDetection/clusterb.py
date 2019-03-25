@@ -1,22 +1,17 @@
 import csv
 import re
+from operator import itemgetter
 
-import pandas
+import pandas as pd
 from collections import defaultdict
-
-import nltk
 import time
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk import PorterStemmer
-from pip._internal.commands.list import tabulate
 from py4j.java_gateway import JavaGateway
-import matplotlib.pyplot as plt
+
 import numpy
 from collections import Counter as mset
-import scipy.cluster.hierarchy as hcluster
-from sklearn.metrics import adjusted_rand_score, fowlkes_mallows_score, jaccard_similarity_score
 
-from DatasetA.summarize import intregation
 
 """""""""""""""""""""
 similarity score parameters a,b,c,d
@@ -25,24 +20,25 @@ a =  float(1/11)  # commen Noun
 b = float(5/11)  # properNoun
 c =  float(1/11) # verb
 d = float(4/11) # hashtag threshold
-threshold = 0.2
-threshold2 = 0.5
+threshold = 0.16
+threshold2 = 0.3
 
 
-
+threshold3=.4
 """""""""""""""
 Initializing NER model and files input
 """""
 gateway = JavaGateway()  # connect to the JVM
-Alltweets = pandas.read_csv("mytweet2", ",")
+inputFile="../Data/mytweet02.csv"
+Alltweets = pd.read_csv(inputFile, ",")
 # print(len(Alltweets))
-filename = "t1_0.5t2_0.32.csv"
-output = open(filename, mode='w', encoding='utf-8')
+Outfilename = "../MyOutputs/clustersIds.csv"
+output = open(Outfilename, mode='wt', encoding='utf-8')
 fieldnames = ['clusterno', 'tweetd']
 writer = csv.DictWriter(output, fieldnames=fieldnames,quoting=csv.QUOTE_MINIMAL)
 writer.writeheader()
 # File path which consists of Abbreviations.
-fileName = "..//slang.txt"#
+fileName = "../utils/slang.txt"#
 #  File Access mode [Read Mode]
 accessMode = "r"
 abbrRemov={}
@@ -66,6 +62,22 @@ def tweetPrecos(textWord):
     _str = stem.stem(_str)
     _str = lmtz.lemmatize(_str, 'v')
     return _str
+
+def tweets_to_clusters(inputfile,clustersFile):
+    x = pd.read_csv(inputfile,',')
+    print(x['text'])
+
+    y = pd.read_csv(clustersFile,',')
+    print(y["tweetd"])
+
+    tweets = {}
+    merged = pd.merge(y, x, left_on='tweetd', right_on='id')
+
+    col = ['tweets', 'clusterID']
+    df = pd.DataFrame(columns=col, index=None)
+    df['tweets'] = merged['text']
+    df['clusterID'] = merged['clusterno']
+    df.to_csv('../MyOutputs/clusters.csv')
 def translator(user_string):
     # Check if selected word matches short forms[LHS] in text file.
     if user_string.upper() in abbrRemov.keys():
@@ -122,7 +134,7 @@ class cluster:
         #     setus = cluster2[key] & self.text['U']
         #     if len(list(setus.elements())) != 0:
         #         SimilrityScore = numpy.math.inf
-        #         return SimilrityScore
+        #         return (self.cno,SimilrityScore)
         # N=Commen Noun ^= Proper noun Z = Propernoun +posessive, V is verb #hastag
 
         similarity = {}
@@ -135,10 +147,10 @@ class cluster:
             else:
                 similarity[k] = 0
 
-        SimilrityScore = ((a * similarity['N']) + (b * similarity['^']) + (b * similarity['Z']) + (
-                c * similarity['V']) + (d * similarity['#']))
+        SimilrityScore = (a * similarity['N']) + (b * similarity['^']) + (b * similarity['Z']) + (
+                c * similarity['V']) + (d * similarity['#'])
         #print(len(cluster2))
-        return SimilrityScore
+        return (self.cno,SimilrityScore)
 
 
 class MergeCluster(cluster):
@@ -157,7 +169,7 @@ class MergeCluster(cluster):
             setus=cluster2.text[key]& self.text['U']
             if len(list(setus.elements())) != 0:
                  SimilrityScore = numpy.math.inf
-                 return SimilrityScore
+                 return (self.cno,SimilrityScore)
         similarity = {}
         for k in keysToMatch:
             if k in self.text and k in cluster2.text:
@@ -171,7 +183,7 @@ class MergeCluster(cluster):
         SimilrityScore = ((a * similarity['N']) + (b * similarity['^']) + (b * similarity['Z']) + (
                 c * similarity['V']) + (
                                  d * similarity['#']))
-        return SimilrityScore
+        return (self.cno,SimilrityScore)
 
 def takeSecond(elem):
     return elem[1]
@@ -199,13 +211,9 @@ def MergeClusters(unitCluster):
         MergeCache[cno1] = MergeCluster(cno1)
         MergeCache[cno1].Extend(unitCluster)
         return
-
-    for cluster in MergeCache:
-        merge = ""
-        score.append((cluster, MergeCache[cluster].similarity(unitCluster)))
-
+    score = list(map(lambda x: MergeCache[x].similarity(unitCluster),MergeCache.keys()))
     score = sorted(score, key=takeSecond, reverse=True)
-    # print("score"+str(score[0]))
+    #print(score)   # print("score"+str(score[0]))
     if (score[0][1] > threshold2):
         MergeCache[score[0][0]].Extend(unitCluster)
     else:
@@ -217,11 +225,42 @@ def MergeClusters(unitCluster):
 import os
 
 """""""""
-Alltweet is a pandas dataframe
+Alltweet is a pd dataframe
 id|text|username|timestamp
   |    |        |       
 
 """""""""
+
+
+def theLastMerge():
+    k=1
+    lenght=len(MergeCache)
+    deactivated=[]
+    for i in range(len(MergeCache)):
+      score=[]
+      for cluster in MergeCache:
+          if(cluster not in deactivated and cluster != i):
+              scorr=MergeCache[cluster].similarity(MergeCache[i])
+              if (scorr[1]> .8):
+                  MergeCache[cluster].Extend(MergeCache[i])
+                  deactivated.append(i)
+                  break
+              else:
+                  score.append(scorr)
+      if( i not in deactivated):
+          score = sorted(score, key=takeSecond, reverse=True)
+          if (score[0][1] > threshold3):
+              MergeCache[score[0][0]].Extend(MergeCache[i])
+              deactivated.append(i)
+    for cluster in MergeCache:
+        if cluster not in deactivated:
+            for td in MergeCache[cluster].ids:
+                writer.writerow({'clusterno': MergeCache[cluster].cno, 'tweetd': td})
+
+def myFun(x,java_object,r):
+    return x.similarity(java_object,r)
+def myFun3(x):
+    return x
 if __name__ == '__main__':
     print("processing data: Thresholds are "+str(threshold)+" and "+str(threshold2))
     MergeCache = defaultdict(MergeCluster)
@@ -229,7 +268,7 @@ if __name__ == '__main__':
     #Lenths_Dic={}
     Alltweets['text'] = Alltweets['text'].apply(lambda x: ' '.join([translator(word) for word in x.split()]))
     Alltweets['text']= Alltweets['text'].apply(lambda x: NERPass(x.lower()))
-    print("proceesed data and starint clustering ")
+    print("proceesed data and staring clustering ")
     UntiClusters = defaultdict(cluster)
     #i = 0;
     cno=-1
@@ -238,13 +277,9 @@ if __name__ == '__main__':
         java_object = row.text
 
         if len(UntiClusters) != 0:  # precation incase no unitclust in cache
-            avg = []
-            for ucluster in UntiClusters:
-                avg.append(
-                    (ucluster, UntiClusters[ucluster].similarity(java_object,row.id)))  # compare the tweet to all clusters
 
+            avg=list(map(lambda x: myFun(UntiClusters[x],java_object,row.id),UntiClusters.keys()))
             avg = sorted(avg, key=takeSecond, reverse=True)
-
             if threshold < avg[0][1]:  # if threshold is passed add it to the cluster
                 UntiClusters[avg[0][0]].addClusterId(row.id, java_object)
                 if UntiClusters[avg[0][0]].IsClusterFull():
@@ -260,17 +295,15 @@ if __name__ == '__main__':
             cno +=1
             UntiClusters[cno] = cluster(cno=cno)
             UntiClusters[cno].addClusterId(id=row.id, text=java_object)
-
+    print("hel")
             # ----------------------------------------------------------------------
     for cluster in UntiClusters:
         MergeClusters(UntiClusters[cluster])
-    for cluster in MergeCache:
-        for td in MergeCache[cluster].ids:
-            writer.writerow({'clusterno': MergeCache[cluster].cno, 'tweetd': td})
+        
+    theLastMerge()
+
 
     t2=time.time()
     print("time to cluster "+str(time.time()-time1))
-    print("summarizing")
-    intregation()
-    print("time to summarize"+str(time.time()-t2))
 
+    tweets_to_clusters(inputFile,Outfilename)

@@ -7,6 +7,9 @@ import itertools
 
 from pandas import read_csv
 
+# Get all permutations of [1, 2, 3]
+perm = itertools.permutations(['N', 'S', 'E', 'W'], 5)
+print(list(perm))
 parent_folder = os.getcwd()
 totaltweets=0
 
@@ -43,4 +46,3 @@ for pair in tweetPairs:
         else:  # dismilar and different clusters assigned
             TN += 1
 print("RAND INDEX "+str((TP+TN)/(TN+TP+FN+FP)))
-print("Recall"+str(TP/(TP+FN)))

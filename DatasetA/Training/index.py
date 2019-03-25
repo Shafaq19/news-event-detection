@@ -212,4 +212,6 @@ def summarization():
         # print(cluster_tweets[ind][i])
 
     select_tweet = pd.DataFrame({'cluster no':a,'tweet id':r,'tweet':t})
-    select_tweet.to_csv("results.csv")
+
+    select_tweet.to_csv("../MyOutputs/summary.csv")
+    return select_tweet

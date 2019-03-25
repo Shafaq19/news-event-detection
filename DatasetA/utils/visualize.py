@@ -10,7 +10,7 @@ import codecs
 # File path which consists of Abbreviations.
 from sklearn.decomposition import PCA
 
-fileName = "..//slang.txt"#
+fileName = "../utils/slang.txt"#
 #  File Access mode [Read Mode]
 accessMode = "r"
 abbrRemov={}
@@ -59,29 +59,6 @@ class TopToolbar(mpld3.plugins.PluginBase):
     """
     def __init__(self):
         self.dict_ = {"type": "toptoolbar"}
-def tweets_to_clusters():
-
-    x = pd.read_csv("mytweet2",)
-    #print(x['text'])
-
-    y = pd.read_csv("..\\Raw_Data\\CS\\events.tsv",'\t')
-
-    y1 = pd.read_csv("..\\Raw_Data\\CS\\evaluations.tsv",sep='\t',quoting=csv.QUOTE_ALL,header=None,names=['EventID','Description','topic'])
-    g=y1.groupby('EventID')['Description'].apply(list)
-    g.columns=['EventID','Description']
-    g=g.to_frame()
-    tweets = {}
-    merged = pd.merge(y, x,left_on='TweetID', right_on='id')
-    merged=  pd.merge(merged,g,left_on='EventID',right_on='EventID')
-    col = ['tweets','clusterID','titles']
-    df = pd.DataFrame(columns=col)
-    df['tweets']=merged['text']
-    df['clusterID']=merged['EventID']
-    df['titles'] = merged['Description']
-    df.to_csv('out1.csv')
-tweets_to_clusters()
-import time
-from sklearn import feature_extraction
 df = pd.read_csv('out1.csv')
 df=df.loc[:1000]
 df['tweets'] = df['tweets'].apply(lambda x: preprocess(x))
