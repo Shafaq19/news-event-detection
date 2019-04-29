@@ -16,7 +16,7 @@ totaltweets=0
 MergeCache={}# contains tweetid and assigned cluster
 myclusters=[]
 i=0
-with open('t1_0.5t2_0.32.csv') as csvfile:
+with open('Training/trainingOutputs/clustersIds.csv') as csvfile:
    reader = csv.DictReader(csvfile)
    for row in reader:
       myclusters.append(row['clusterno'])
@@ -45,4 +45,6 @@ for pair in tweetPairs:
             FP += 1
         else:  # dismilar and different clusters assigned
             TN += 1
-print("RAND INDEX "+str((TP+TN)/(TN+TP+FN+FP)))
+
+print("precision"+str((TP)/(FP+TP)))
+print("Rand "+str((TP)/(TP+FN)))

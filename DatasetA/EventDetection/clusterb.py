@@ -1,7 +1,5 @@
 import csv
 import re
-from operator import itemgetter
-
 import pandas as pd
 from collections import defaultdict
 import time
@@ -12,6 +10,8 @@ from py4j.java_gateway import JavaGateway
 import numpy
 from collections import Counter as mset
 
+from DatasetA.EventDetection.index import summarization
+from DatasetA.EventDetection.tagging import TopicCategorization
 
 """""""""""""""""""""
 similarity score parameters a,b,c,d
@@ -53,6 +53,12 @@ preproceessing variable and functions
 lmtz=WordNetLemmatizer()
 stem=PorterStemmer()
 
+def translator(user_string):
+    # Check if selected word matches short forms[LHS] in text file.
+    if user_string.upper() in abbrRemov.keys():
+        # If match found replace it with its appropriate phrase in text file.
+        user_string = abbrRemov[user_string.upper()];
+    return user_string
 def tweetPrecos(textWord):
     _str = re.sub('[^a-zA-Z0-9-_.]', '', textWord)
     # Check if selected word matches short forms[LHS] in text file.
@@ -78,12 +84,7 @@ def tweets_to_clusters(inputfile,clustersFile):
     df['tweets'] = merged['text']
     df['clusterID'] = merged['clusterno']
     df.to_csv('../MyOutputs/clusters.csv')
-def translator(user_string):
-    # Check if selected word matches short forms[LHS] in text file.
-    if user_string.upper() in abbrRemov.keys():
-        # If match found replace it with its appropriate phrase in text file.
-        user_string = abbrRemov[user_string.upper()];
-    return user_string
+
 
 
 """""
@@ -279,7 +280,8 @@ if __name__ == '__main__':
         if len(UntiClusters) != 0:  # precation incase no unitclust in cache
 
             avg=list(map(lambda x: myFun(UntiClusters[x],java_object,row.id),UntiClusters.keys()))
-            avg = sorted(avg, key=takeSecond, reverse=True)
+            avg = sorted(avg,key= lambda x: x[1], reverse=True)
+# sorted(avg, key=takeSecond, reverse=True)
             if threshold < avg[0][1]:  # if threshold is passed add it to the cluster
                 UntiClusters[avg[0][0]].addClusterId(row.id, java_object)
                 if UntiClusters[avg[0][0]].IsClusterFull():
@@ -299,7 +301,7 @@ if __name__ == '__main__':
             # ----------------------------------------------------------------------
     for cluster in UntiClusters:
         MergeClusters(UntiClusters[cluster])
-        
+
     theLastMerge()
 
 
@@ -307,3 +309,7 @@ if __name__ == '__main__':
     print("time to cluster "+str(time.time()-time1))
 
     tweets_to_clusters(inputFile,Outfilename)
+    Tagger = TopicCategorization()
+    Tagger.tagging()
+    t2 = time.time()
+    print("time to summarize " + str(time.time() - time1))

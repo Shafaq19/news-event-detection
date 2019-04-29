@@ -14,6 +14,7 @@ def crawl(user,count,writer):
             writer.writerow({'id': tweet['id'], 'created_at': tweet['created_at'], 'text': tweet['text'],
                              'user': tweet['user']['screen_name'], 'retweet_count': tweet['retweet_count']})
             tweets.append(tweet['text'])
+            print(tweet['text'])
     except Exception as e:
         print(e)
     return tweets
@@ -82,13 +83,14 @@ except:
 # tweet_ids_list = df[0].iloc[124510:].tolist()
 #
 # # results=lookup_tweets(tweet_ids_list,api)
-#
-users=['RadioPakistan','geonews_english','BBCBreaking','ARYNEWSOFFICIAL','nytimes','Reuters','ABCWorldNewsNow','BBCWorld','BreakingNews','FoxNews','MSNBC','NBCNews','SkyNews','CNN']
-f=open('../Data/mytweet02.csv', 'wt', encoding="utf8")
-fieldnames = ['id', 'created_at', 'text', 'user', 'retweet_count']
-writer = csv.DictWriter(f, fieldnames=fieldnames)
+#ARYNEWSOFFICIAL,
+def scrapp():
 
-writer.writeheader()
-for user in users:
-    t=crawl(user,500,writer)
-    print(len(t))
+    users=['BBCBreaking','nytimes','Reuters','ABCWorldNewsNow','BBCWorld','BreakingNews','FoxNews','MSNBC','NBCNews','SkyNews','CNN','geonews_english']
+    f=open('../Data/mytweet02.csv', 'wt', encoding="utf8")
+    fieldnames = ['id', 'created_at', 'text', 'user', 'retweet_count']
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+
+    writer.writeheader()
+    for user in users:
+        crawl(user,500,writer)

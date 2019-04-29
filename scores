@@ -1,0 +1,31 @@
+threshold = 0.4
+threshold2 = 0.30
+
+RAND INDEX 0.9770289195091616
+Recall0.7341660927592676
+Events:119
+
+
+
+a = .90  # commen Noun
+b = .9  # properNoun
+c = .45  # verb
+d = .9  # hashtag threshold
+threshold = 0.3
+threshold2 = 0.20
+RAND INDEX 0.8838975581724178
+Recall0.7705463182897863
+
+
+a = .90  # commen Noun
+b = .9  # properNoun
+c = .45  # verb
+d = .9  # hashtag threshold
+threshold = 0.30
+threshold2 = 0.25
+RAND INDEX 0.9727859523803635
+Recall0.6107906345436037
+
+
+
+defaultdict(None, {'#': Counter({'#news': 1, '#bbc': 1})})

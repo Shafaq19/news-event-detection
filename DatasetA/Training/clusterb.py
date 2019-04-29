@@ -20,19 +20,19 @@ a =  float(1/11)  # commen Noun
 b = float(5/11)  # properNoun
 c =  float(1/11) # verb
 d = float(4/11) # hashtag threshold
-threshold = 0.16
-threshold2 = 0.3
+threshold = 0.25
+threshold2 = 0.2
 
 
 threshold3=.4
 """""""""""""""
 Initializing NER model and files input
 """""
-gateway = JavaGateway()  # connect to the JVM
-inputFile="../Data/mytweet02.csv"
+gateway = JavaGateway()  # coect to the JVM
+inputFile="../Data/mytweet2"
 Alltweets = pd.read_csv(inputFile, ",")
 # print(len(Alltweets))
-Outfilename = "../MyOutputs/clustersIds.csv"
+Outfilename = "trainingOutputs/clustersIds.csv"
 output = open(Outfilename, mode='wt', encoding='utf-8')
 fieldnames = ['clusterno', 'tweetd']
 writer = csv.DictWriter(output, fieldnames=fieldnames,quoting=csv.QUOTE_MINIMAL)
@@ -77,7 +77,7 @@ def tweets_to_clusters(inputfile,clustersFile):
     df = pd.DataFrame(columns=col, index=None)
     df['tweets'] = merged['text']
     df['clusterID'] = merged['clusterno']
-    df.to_csv('../MyOutputs/clusters.csv')
+    df.to_csv('trainingOutputs/clusters.csv')
 def translator(user_string):
     # Check if selected word matches short forms[LHS] in text file.
     if user_string.upper() in abbrRemov.keys():
@@ -307,3 +307,4 @@ if __name__ == '__main__':
     print("time to cluster "+str(time.time()-time1))
 
     tweets_to_clusters(inputFile,Outfilename)
+

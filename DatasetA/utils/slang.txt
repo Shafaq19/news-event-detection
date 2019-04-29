@@ -17,6 +17,7 @@ B4N=Bye For Now
 BF= Boy Friend
 CU=See You
 CUL8R=See You Later
+CONGRATS= Congratulations
 CYA=See You
 FAQ=Frequently Asked Questions
 FC=Fingers Crossed

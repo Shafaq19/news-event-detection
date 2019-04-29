@@ -6,7 +6,6 @@ import math
 def tweets_to_clusters():
 
     x = pd.read_csv("mytweet2",)
-    print(x['text'])
 
     y = pd.read_csv("clustersNew.csv",)
     print(y["tweetd"])
@@ -19,7 +18,7 @@ def tweets_to_clusters():
                 z = y['clusterno'][i]
                 a = x['text'][j]
                 tweets[a] = z
-                print(i)
+                # print(i)
 
     x = []
     y = []
@@ -143,7 +142,7 @@ def summarization(filename):
 
         final[i] = counts
 
-        print(final[0])
+        # print(final[0])
 
     sum_tweets = []
 
