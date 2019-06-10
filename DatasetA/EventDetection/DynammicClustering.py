@@ -1,9 +1,11 @@
+import ast
 import csv
 import re
 from collections import defaultdict
 
 from collections import Counter as mset
 
+import numpy
 from nltk import WordNetLemmatizer
 from py4j.java_gateway import JavaGateway
 import pandas as pd
@@ -50,6 +52,11 @@ class DynammicClustering:
         fieldnames = ['clusterno', 'tweetd']
         self.writer = csv.DictWriter(output, fieldnames=fieldnames, quoting=csv.QUOTE_MINIMAL)
         self.writer.writeheader()
+
+        output1 = open("../MyOutputs/slang2.csv", mode='wt', encoding='utf-8')
+        fieldnames = ['id', 'slangs']
+        self.slang_writer = csv.DictWriter(output1, fieldnames=fieldnames, quoting=csv.QUOTE_MINIMAL)
+        self.slang_writer.writeheader()
         self.lmtz=WordNetLemmatizer()
         self.MergeCache = defaultdict(MergeCluster)
         self.UntiClusters = defaultdict(cluster)
@@ -70,16 +77,23 @@ class DynammicClustering:
             x = pd.read_csv(inputfile, ',')
 
             y = pd.read_csv(clustersFile, ',')
+            z=pd.read_csv("../MyOutputs/slang2.csv",sep=',', quotechar='"',converters = {1: ast.literal_eval})
 
             tweets = {}
             merged = pd.merge(y, x, left_on='tweetd', right_on='id')
-
+            merged=pd.merge(merged, z,left_on='id',right_on='id')
             col = ['tweets', 'clusterID']
             df = pd.DataFrame(columns=col, index=None)
-            df['tweets'] = merged['text']
+            df['tweets'] = merged['text'].apply(
+                lambda x: self.tweet_clean(x.lower(),merged.loc[merged['text']==x,'slangs'].iloc[0]))
+
+            df['tweets'].replace('', numpy.nan, inplace=True)
+            df.dropna(subset=['tweets'], inplace=True)
             df['clusterID'] = merged['clusterno']
             df.to_csv('../MyOutputs/clusters.csv')
-
+            df['tweets'] = merged['text']
+            df.to_csv('../MyOutputs/Cleaned.csv')
+    #abbr removed
     def translator(self,user_string):
             # Check if selected word matches short forms[LHS] in text file.
             if user_string.upper() in abbrRemov.keys():
@@ -91,22 +105,70 @@ class DynammicClustering:
       preproceessing variable and functions
       """""
 
-    def tweet_clean(self, t):
-
+    def tweet_clean(self, t,words):
+        #cut out formating of new lines
+        t=t.replace('\n'," ").replace('\r'," ")
+        #for each word that we identified as removeable like emoji we remove it
+        for ele in words:
+             if len(ele) >= 2:
+               t=t.replace(ele+" "," ")
+        #remove mentions
         t = re.sub('@[^\s]+','',t)
+        #remove urls
+        t = re.sub(
+            r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''',
+            " ", t)
+        #remove wspace
         t = re.sub(r"[^\w\s]", "", t)
-        t = re.sub(" \d+", " ", t)
-        return t
 
-    def NERPass(self,text):
+        if (t.isspace()):
+            return None
+
+        return t
+    """""
+    
+    performs Part of the speech tagging
+    
+    input: text to parse and tweet id
+    out: Default dict of tags
+    """
+    def NERPass(self,text,id):
             Preprocessed = defaultdict()
             java_object = DynammicClustering.gateway.entry_point.getStack(text.lower())  # return {A: "adjective list",N:"nouns list....}
-            keysToMatch = {'N', '^', 'Z', 'M', '#', 'V', 'T'}
+            keysToMatch = { '#', 'V', 'T'}
+            nounKeys={'N', '^', 'Z', 'M','S'}
+            removeables={'!','~','G','E','#'}
+            slangs=[]
             if 'U' in java_object:
+                #lematization does better preprocessing for more matches
                 Preprocessed['U'] = mset(self.lmtz.lemmatize(word, 'v') for word in re.split(" ", java_object['U']))
+            #match { '#', 'V', 'T'}
             for key in keysToMatch:
                 if (key in java_object):
                     Preprocessed[key] = mset(self.lmtz.lemmatize(word, 'v') for word in re.split(" ", java_object[key]))
+            sett=None
+            #match Nouns (all kinds in here)
+            for key in nounKeys:
+                if (key in java_object):
+                    if sett is None:
+                        sett = mset(self.lmtz.lemmatize(word, 'v') for word in re.split(" ", java_object[key]))
+                    else:
+                        sett = sett |  mset(self.lmtz.lemmatize(word, 'v') for word in re.split(" ", java_object[key]))
+
+            if sett != None:
+                Preprocessed['N']=sett
+            sett=None
+            #slangs and emotican in the tweets
+            for key in removeables:
+                if (key in java_object):
+                    if sett is None:
+                        sett = set(self.lmtz.lemmatize(word, 'v') for word in re.split(" ", java_object[key]))
+                    else:
+                        sett = sett | set(self.lmtz.lemmatize(word, 'v') for word in re.split(" ", java_object[key]))
+
+            if sett != None:
+                self.slang_writer.writerow({'id': id, 'slangs': list(sett)})
+
             return Preprocessed
 
     def MergeClusters(self,unitCluster):
@@ -136,28 +198,31 @@ class DynammicClustering:
     def takeSecond(self,elem):
                 return elem[1]
     def theLastMerge(self):
-                k = 1
-                lenght = len(self.MergeCache)
-                deactivated = []
-                for i in range(len(self.MergeCache)):
-                    score = []
-                    for cluster in self.MergeCache:
-                        if (cluster not in deactivated and cluster != i):
-                            scorr = self.MergeCache[cluster].similarity(self.MergeCache[i],self.a,self.b,self.c,self.d)
-                            if (scorr[1] > .8):
-                                self.MergeCache[cluster].Extend(self.MergeCache[i])
-                                deactivated.append(i)
-                                break
-                            else:
-                                score.append(scorr)
-                    if (i not in deactivated):
-                        score = sorted(score, key=self.takeSecond, reverse=True)
-                        if (score[0][1] > self.threshold3):
-                            self.MergeCache[score[0][0]].Extend(self.MergeCache[i])
-                            deactivated.append(i)
-                xcnn=0
+                # k = 1
+                # lenght = len(self.MergeCache)
+                # deactivated = []
+                # for i in range(len(self.MergeCache)):
+                #     score = []
+                #     for cluster in range(i+1,len(self.MergeCache)):
+                #         if (cluster not in deactivated and cluster != i):
+                #             scorr = self.MergeCache[cluster].similarity(self.MergeCache[i],self.a,self.b,self.c,self.d)
+                #             if (scorr[1] > .8):
+                #                 self.MergeCache[cluster].Extend(self.MergeCache[i])
+                #                 deactivated.append(i)
+                #                 break
+                #             else:
+                #                 score.append(scorr)
+                #     if (i not in deactivated):
+                #         score = sorted(score, key=self.takeSecond, reverse=True)
+                #         if (score[0][1] > self.threshold3):
+                #             self.MergeCache[score[0][0]].Extend(self.MergeCache[i])
+                #             deactivated.append(i)
+                # xcnn=0
+                # for cluster in self.MergeCache:
+                #     if cluster not in deactivated:
+                #         for td in self.MergeCache[cluster].ids:
+                #             xcnn+=1
+                #             self.writer.writerow({'clusterno': cluster, 'tweetd': td})
                 for cluster in self.MergeCache:
-                    if cluster not in deactivated:
-                        for td in self.MergeCache[cluster].ids:
-                            xcnn+=1
-                            self.writer.writerow({'clusterno': xcnn, 'tweetd': td})
+                    for td in self.MergeCache[cluster].ids:
+                            self.writer.writerow({'clusterno': cluster, 'tweetd': td})

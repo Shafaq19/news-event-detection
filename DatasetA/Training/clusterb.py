@@ -19,11 +19,9 @@ similarity score parameters a,b,c,d
 a =  float(1/11)  # commen Noun
 b = float(5/11)  # properNoun
 c =  float(1/11) # verb
-d = float(4/11) # hashtag threshold
-threshold = 0.25
-threshold2 = 0.2
-
-
+d = float(4/11)# hashtag threshold
+threshold = 0.3
+threshold2 = 0.4
 threshold3=.4
 """""""""""""""
 Initializing NER model and files input
@@ -32,7 +30,7 @@ gateway = JavaGateway()  # coect to the JVM
 inputFile="../Data/mytweet2"
 Alltweets = pd.read_csv(inputFile, ",")
 # print(len(Alltweets))
-Outfilename = "trainingOutputs/clustersIds.csv"
+Outfilename = "trainingOutputs/clustersIds03_04_04.csv"
 output = open(Outfilename, mode='wt', encoding='utf-8')
 fieldnames = ['clusterno', 'tweetd']
 writer = csv.DictWriter(output, fieldnames=fieldnames,quoting=csv.QUOTE_MINIMAL)

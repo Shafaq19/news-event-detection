@@ -3,8 +3,13 @@ class purpose: general cluster class clustering
 author: Shafaq Arshad
 """
 import numpy
+"""""
 
-keysToMatch = {'N', '^', 'Z', 'M', '#', 'V', 'T', 'U'}
+N: Noun
+#: hastag
+
+"""
+keysToMatch = {'N', '#', 'V', 'U'}
 class cluster:
     def __init__(self, cno):
         self.cno = cno
@@ -42,14 +47,6 @@ class cluster:
 
     def similarity(self, cluster2,id,a,b,c,d):
 
-        # # # matching links. If a links matches return a infity score as if they havr same link they talk abut same event
-        # key = 'U'
-        # if (key in cluster2.keys() and key in self.text.keys()):
-        #     setus = cluster2[key] & self.text['U']
-        #     if len(list(setus.elements())) != 0:
-        #         SimilrityScore = numpy.math.inf
-        #         return (self.cno,SimilrityScore)
-        # N=Commen Noun ^= Proper noun Z = Propernoun +posessive, V is verb #hastag
 
         similarity = {}
         for k in keysToMatch:
@@ -61,7 +58,7 @@ class cluster:
             else:
                 similarity[k] = 0
 
-        SimilrityScore = (a * similarity['N']) + (b * similarity['^']) + (b * similarity['Z']) + (
+        SimilrityScore = (a* similarity['N']) + (
                 c * similarity['V']) + (d * similarity['#'])
         #print(len(cluster2))
         return (self.cno,SimilrityScore)
@@ -77,13 +74,6 @@ class MergeCluster(cluster):
                 self.text[key] = cluster.text[key]
 
     def similarity(self, cluster2,a,b,c,d):
-
-        key = 'U'
-        if (key in cluster2.text.keys() and key in self.text.keys()):
-            setus=cluster2.text[key]& self.text['U']
-            if len(list(setus.elements())) != 0:
-                 SimilrityScore = numpy.math.inf
-                 return (self.cno,SimilrityScore)
         similarity = {}
         for k in keysToMatch:
             if k in self.text and k in cluster2.text:
@@ -93,8 +83,7 @@ class MergeCluster(cluster):
                 similarity[k] = sum(a2.values())/sum(a1.values())
             else:
                 similarity[k] = 0
-
-        SimilrityScore = ((a * similarity['N']) + (b * similarity['^']) + (b * similarity['Z']) + (
-                c * similarity['V']) + (
-                                 d * similarity['#']))
+        similarity['U'] = numpy.math.inf if similarity['U'] > 0 else 0
+        SimilrityScore = (a* similarity['N']) + (
+                c * similarity['V']) + (d * similarity['#'])
         return (self.cno,SimilrityScore)

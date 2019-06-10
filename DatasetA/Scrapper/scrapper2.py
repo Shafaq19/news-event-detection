@@ -4,7 +4,11 @@ import math
 import tweepy
 from pandas import read_csv
 
-
+"""""
+crawls the api for tweets 
+args: user to crawl, nomber of tweets to fetch, the excel file to write the tweets too
+tweet id, text,retweets, date formed will be saved in tweets.csv fie
+"""
 def crawl(user,count,writer):
     tweets=[]
     try:
@@ -14,17 +18,14 @@ def crawl(user,count,writer):
             writer.writerow({'id': tweet['id'], 'created_at': tweet['created_at'], 'text': tweet['text'],
                              'user': tweet['user']['screen_name'], 'retweet_count': tweet['retweet_count']})
             tweets.append(tweet['text'])
-            print(tweet['text'])
     except Exception as e:
         print(e)
     return tweets
-"""""
-  if (tweet['retweet_count']>0):
-                        retweetMap = {}
-                        retweet = api.retweets(tweet['id'], 5)
-                        print(retweet)
 
-**/
+""""
+function that look up tweets from the api from a list 
+of users
+
 """""
 def lookup_tweets(tweet_IDs, api):
     f=open('../Data/mytweet02.csv', 'wt', encoding="utf8")
@@ -59,7 +60,9 @@ def lookup_tweets(tweet_IDs, api):
     except tweepy.TweepError:
         print( 'Something went wrong, quitting...')
         #print(tweepy.TweepError.reason)
-
+"""""
+token initialization for api
+"""""
 access_key = '911986131230654464-Mv4djQ3PTcCW3cvDYxcFkZLGjj7kX7n'
 access_secret = 'vDEEfyUESHqsHtZGvhgUTddCjWdchlNq2UfWZBlN3Jl9M'
 consumer_key = 'VtCTykihYAXXvX4sV3CVsdLM9'
@@ -75,15 +78,11 @@ try:
 except:
     print("\nError in authenticating with the Twitter's API")
     exit()
-#
-# tweetIdsFiles="tweets.csv"
-# df=read_csv(tweetIdsFiles,",",header=None,index_col=None)
-# print(df)
-#
-# tweet_ids_list = df[0].iloc[124510:].tolist()
-#
-# # results=lookup_tweets(tweet_ids_list,api)
-#ARYNEWSOFFICIAL,
+
+
+"""""
+Main scrapper fetches tweets and saves it
+"""
 def scrapp():
 
     users=['BBCBreaking','nytimes','Reuters','ABCWorldNewsNow','BBCWorld','BreakingNews','FoxNews','MSNBC','NBCNews','SkyNews','CNN','geonews_english']

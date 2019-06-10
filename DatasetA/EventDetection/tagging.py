@@ -16,6 +16,8 @@ class TopicCategorization:
         fileName = "../utils/slang.txt"  #
         #  File Access mode [Read Mode]
         accessMode = "r"
+        self.slangs=  pandas.read_csv("../MyOutputs/Cleaned.csv")
+
 
         with open(fileName, accessMode) as m:
             dataFromFile = csv.reader(m, delimiter="=")
@@ -23,9 +25,7 @@ class TopicCategorization:
             for row in dataFromFile:
                  TopicCategorization.abbrRemov[row[0]] = row[1]
 
-   # #crawl or fetch the tweets max: 3200
-    # T.crawl()
-
+    #Topic parser
     def parseFile(self,input_data, headers):
         status=False
 
@@ -33,6 +33,7 @@ class TopicCategorization:
             response = requests.post(TopicCategorization.calais_url, data=input_data.encode("utf-8"), headers=headers, timeout=80, )
         except:
                 print("status code 200")
+                return "No topic found"
 
         if response.status_code == 200:
             content = json.loads(response.text)
@@ -62,6 +63,8 @@ class TopicCategorization:
         t = t.replace("@", "")
         t = re.sub(r"[^\w\s]", "", t)
         t = re.sub(" \d+", " ", t)
+        if (t.isspace()):
+            return None
 
         return t
 
@@ -77,29 +80,43 @@ class TopicCategorization:
         return self.tweet_clean(user_string)
 
     def tagging(self,):
+        #access auth
         access_token = "EB2iLsNMLNGUCMsiQo1F7Gg3fKDNDuZs";
         headers = {'X-AG-Access-Token': access_token, 'Content-Type': 'text/raw', 'outputformat': 'application/json'}
-        clusterFile = '../MyOutputs/clusters.csv'
+        clusterFile = '../MyOutputs/Cleaned.csv'
         df = pandas.read_csv(clusterFile).drop(['Unnamed: 0'], axis=1)
         groups = df.groupby('clusterID')
-
-        filename = "../MyOutputs/topics.csv"
+        filename = "../MyOutputs/topicsA.csv"
         output = open(filename, mode='w', encoding='utf-8')
         fieldnames = ['clusterno', 'topic', 'tweet']
         writer = csv.DictWriter(output, fieldnames=fieldnames, quoting=csv.QUOTE_MINIMAL)
         writer.writeheader()
-        summ = summarization(clusterFile)
+        summ = summarization('../MyOutputs/clusters.csv')
+        print("hello")
         count = 0
         for name, group in groups:
-            if count < 10:
+            if count < 10000:
                 tweety = ' '.join(group['tweets'].tolist())# ahprt text document by joins tweets in the cluster
                 tweety = self.translator(tweety)
+                # tweety=self.tweet_clean(tweety)
+                # if(tweety == None or tweety == ""): break
                 topic = self.parseFile(tweety, headers)
                 tweet = summ.loc[summ['cluster no'] == name, ['tweet']].values
-                tweet = self.translator(str(tweet[0]))
 
                 if len(tweet) != 0:
-                    writer.writerow({'clusterno': name, 'topic': topic, 'tweet': tweet})
+                    tweet = self.translator(str(tweet[0]))
+
+                    if topic != "No topic found":
+
+                        print(name,topic,tweet)
+                        writer.writerow({'clusterno': name, 'topic': topic, 'tweet': tweet})
+                else:
+
+                    tweet = self.translator(group['tweets'].tolist()[0])
+                    if topic != "No topic found":
+                        print(name, topic, tweet)
+                        writer.writerow({'clusterno': name, 'topic': topic, 'tweet': tweet})
+
             else:
                 break
             count += 1
