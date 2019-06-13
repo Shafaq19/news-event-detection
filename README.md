@@ -16,7 +16,7 @@ You can [also][df1]:
   - Responsive and self refreshed
 
 
-> The overriding design goal for twoitter based newsstand 
+> The overriding design goal for tweetter based newsstand 
 > is to make it as easier and faster for journalist to cover stories
 > as possible. The idea is that a
 > since people are already on site and actively reporting it on tweets
@@ -29,10 +29,17 @@ Newsstand uses a number of open source projects to work properly:
 * [NLTK](df1)  - leading platform for building Python programs to work with human language data.
 * [Standford NER reconizer](df1) - an awesome named entity reconizer 
 * [Python Libararies](dill) Pandas, Numpy and what not!!!
+^ [OpenCalais.Api] for topic categorization
+
 
 ### Installation
 
 Newsstand requires NER package to run (git clone https://shafaqA15@bitbucket.org/shafaqA15/named-entity-recognizer.git) and run the java gateway
+All code is in the DatasetA/EventDetection folder
+#DatasetA/Myoutputs has all output files generated
+cluster.csv has tweets andd their assigned c;uster ids
+summary has headlines along with cluster id
+topics: contains topics
 
 ### Plugins
 
