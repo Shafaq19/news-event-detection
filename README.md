@@ -35,11 +35,11 @@ Newsstand uses a number of open source projects to work properly:
 ### Installation
 
 Newsstand requires NER package to run (git clone https://shafaqA15@bitbucket.org/shafaqA15/named-entity-recognizer.git) and run the java gateway
-All code is in the DatasetA/EventDetection folder
-###DatasetA/Myoutputs has all output files generated
-###cluster.csv has tweets andd their assigned c;uster ids
-###summary has headlines along with cluster id
-###topics: contains topics
+>All code is in the DatasetA/EventDetection folder
+>DatasetA/Myoutputs has all output files generated
+>cluster.csv has tweets andd their assigned c;uster ids
+>summary has headlines along with cluster id
+>topics: contains topics
 
 ### Plugins
 
