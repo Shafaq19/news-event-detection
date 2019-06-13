@@ -10,8 +10,8 @@ from py4j.java_gateway import JavaGateway
 import numpy
 from collections import Counter as mset
 
-from DatasetA.EventDetection.index import summarization
-from DatasetA.EventDetection.tagging import TopicCategorization
+from MainFolder.EventDetection.index import summarization
+from MainFolder.EventDetection.tagging import TopicCategorization
 
 """""""""""""""""""""
 similarity score parameters a,b,c,d

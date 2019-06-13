@@ -2,11 +2,11 @@ import time
 
 import numpy
 
-from DatasetA.EventDetection.DynammicClustering import DynammicClustering
-from  DatasetA.EventDetection.ClusterClass import cluster, MergeCluster
-from DatasetA.EventDetection.tagging import TopicCategorization
+from MainFolder.EventDetection.DynammicClustering import DynammicClustering
+from  MainFolder.EventDetection.ClusterClass import cluster, MergeCluster
+from MainFolder.EventDetection.tagging import TopicCategorization
 # from DatasetA.Scrapper.scrapper2 import scrapp
-from DatasetA.Scrapper.scrapper2 import scrapp
+from MainFolder.Scrapper.scrapper2 import scrapp
 
 if __name__ == '__main__':
     print("Scrapping Twitter")

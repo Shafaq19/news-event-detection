@@ -10,7 +10,7 @@ from nltk import WordNetLemmatizer
 from py4j.java_gateway import JavaGateway
 import pandas as pd
 # File path which consists of Abbreviations.
-from DatasetA.EventDetection.ClusterClass import MergeCluster,cluster
+from MainFolder.EventDetection.ClusterClass import MergeCluster,cluster
 
 fileName = "../utils/slang.txt"#
 #  File Access mode [Read Mode]

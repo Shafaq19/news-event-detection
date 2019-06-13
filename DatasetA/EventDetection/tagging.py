@@ -6,7 +6,7 @@ import pandas
 import requests
 import time
 
-from DatasetA.EventDetection.index import summarization
+from MainFolder.EventDetection.index import summarization
 class TopicCategorization:
     calais_url = 'https://api.thomsonreuters.com/permid/calais'
     abbrRemov={}

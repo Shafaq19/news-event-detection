@@ -5,7 +5,7 @@ import re
 import pandas
 import requests
 
-from DatasetA.EventDetection.index import summarization
+from MainFolder.EventDetection.index import summarization
 
 calais_url = 'https://api.thomsonreuters.com/permid/calais'
 # File path which consists of Abbreviations.
