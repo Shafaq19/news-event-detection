@@ -81,7 +81,7 @@ class TopicCategorization:
 
     def tagging(self,):
         #access auth
-        access_token = "EB2iLsNMLNGUCMsiQo1F7Gg3fKDNDuZs";
+        access_token = "add access rtoken
         headers = {'X-AG-Access-Token': access_token, 'Content-Type': 'text/raw', 'outputformat': 'application/json'}
         clusterFile = '../MyOutputs/Cleaned.csv'
         df = pandas.read_csv(clusterFile).drop(['Unnamed: 0'], axis=1)
